@@ -41,3 +41,14 @@ export async function encryptData(data, key) {
 
   return { ciphertext, iv };
 }
+
+export async function decryptData(ciphertext, iv, key) {
+  const decrypted = await crypto.subtle.decrypt(
+    { name: "AES-GCM", iv: iv },
+    key,
+    ciphertext
+  );
+
+  const decoder = new TextDecoder();
+  return JSON.parse(decoder.decode(decrypted));
+}
