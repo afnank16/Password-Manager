@@ -38,3 +38,22 @@ export async function loadAllEntries(key) {
 export async function removeEntry(id) {
   return deleteEntry(id);
 }
+
+const VERIFY_KEY = "verify";
+const VERIFY_PLAINTEXT = "vault-ok";
+
+export async function saveVerifyToken(key) {
+  const { ciphertext, iv } = await encryptData(VERIFY_PLAINTEXT, key);
+  await setMeta(VERIFY_KEY, { ciphertext, iv });
+}
+
+export async function verifyKey(key) {
+  const token = await getMeta(VERIFY_KEY);
+  if (!token) return true; // no token yet, first setup
+  try {
+    const result = await decryptData(token.ciphertext, token.iv, key);
+    return result === VERIFY_PLAINTEXT;
+  } catch {
+    return false;
+  }
+}
