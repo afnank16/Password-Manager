@@ -1,21 +1,27 @@
 import { useState, useRef } from "react";
 import { deriveKey, saveVerifyToken } from "../db/vault";
+import { createVault } from "../db/db";
+
 
 function MasterPasswordSetup({ onSetup }) {
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const confirmInputRef = useRef(null);
+  const [name, setName] = useState("");
+  const passwordRef = useRef(null);
+  const confirmPasswordRef = useRef(null);
 
-  async function handleSetup() {// Validate password and confirm
-  if (password.length < 8) { setError("Password must be at least 8 characters"); return; }
-  if (password !== confirm) { setError("Passwords do not match"); return; }
-  setLoading(true);
-  const key = await deriveKey(password);
-  await saveVerifyToken(key);
-  onSetup(key);
-}
+  async function handleSetup() {
+    if (!name) { setError("Please enter a vault name"); return; }
+    if (password.length < 8) { setError("Password must be at least 8 characters"); return; }
+    if (password !== confirm) { setError("Passwords do not match"); return; }
+    setLoading(true);
+    const vaultId = await createVault(name);
+    const key = await deriveKey(vaultId, password);
+    await saveVerifyToken(vaultId, key);
+    onSetup(key, vaultId);
+  }
 
   const handleKeyDown = (e, nextRef) => { // Handle Enter key to move focus to the next input
     if (e.key === "Enter") {
@@ -35,17 +41,24 @@ function MasterPasswordSetup({ onSetup }) {
         </div>
 
         <div className="flex flex-col gap-3">
+          <input type="text" placeholder="Vault name (e.g. Personal)"
+          autoFocus
+            value={name}
+            onChange={e => setName(e.target.value)}
+            onKeyDown={(e)=>handleKeyDown(e,passwordRef)}
+            className="w-full bg-gray-50 text-gray-900 placeholder-gray-400 border border-gray-200 rounded-xl px-4 py-3 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100" 
+            />
           <input
-            autoFocus
+          ref={passwordRef}
             type="password"
             placeholder="Master password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            onKeyDown={(e) => handleKeyDown(e, confirmInputRef)}
+            onKeyDown={(e) => handleKeyDown(e, confirmPasswordRef)}
             className="w-full bg-gray-50 text-gray-900 placeholder-gray-400 border border-gray-200 rounded-xl px-4 py-3 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
           />
           <input
-            ref={confirmInputRef}
+            ref={confirmPasswordRef}
             type="password"
             placeholder="Confirm password"
             value={confirm}

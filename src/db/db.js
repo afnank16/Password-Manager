@@ -1,49 +1,67 @@
 import { openDB } from "idb";
 
 const DB_NAME = "VaultDB";
-const STORE_NAME = "entries";
-const META_STORE = "meta";
-const DB_VERSION = 2;
+const DB_VERSION = 3;
 
 async function getDB() {
   return openDB(DB_NAME, DB_VERSION, {
     upgrade(db) {
-      if (!db.objectStoreNames.contains(STORE_NAME)) {
-        db.createObjectStore(STORE_NAME, { keyPath: "id", autoIncrement: true });
+      if (!db.objectStoreNames.contains("vaults")) {
+        db.createObjectStore("vaults", { keyPath: "id", autoIncrement: true });
       }
-      if (!db.objectStoreNames.contains(META_STORE)) {
-        db.createObjectStore(META_STORE);
+      if (!db.objectStoreNames.contains("entries")) {
+        const store = db.createObjectStore("entries", { keyPath: "id", autoIncrement: true });
+        store.createIndex("vaultId", "vaultId");
+      }
+      if (!db.objectStoreNames.contains("meta")) {
+        db.createObjectStore("meta");
       }
     },
   });
 }
 
-export async function getMeta(key) {
+// Vaults
+export async function createVault(name) {
   const db = await getDB();
-  return db.get(META_STORE, key);
+  return db.add("vaults", { name });
 }
 
-export async function setMeta(key, value) {
+export async function getAllVaults() {
   const db = await getDB();
-  return db.put(META_STORE, value, key);
+  return db.getAll("vaults");
 }
 
-export async function saveEntry(entry) {
+// Entries
+export async function saveEntry(vaultId, entry) {
   const db = await getDB();
-  return db.add(STORE_NAME, entry);
+  return db.add("entries", { ...entry, vaultId });
 }
 
-export async function getAllEntries() {
+export async function getAllEntries(vaultId) {
   const db = await getDB();
-  return db.getAll(STORE_NAME);
+  console.log("querying vaultId:", vaultId);
+  const all = await db.getAll("entries");
+  console.log("all raw entries:", all);
+  return db.getAllFromIndex("entries", "vaultId", vaultId);
+}
+
+export async function updateEntry(id, vaultId, data) {
+  const db = await getDB();
+  return db.put("entries", { ...data, id, vaultId });
 }
 
 export async function deleteEntry(id) {
   const db = await getDB();
-  return db.delete(STORE_NAME, id);
+  return db.delete("entries", id);
 }
 
-export async function updateEntry(id, data) {
+// Meta
+export async function getMeta(key) {
   const db = await getDB();
-  return db.put(STORE_NAME, { ...data, id });
+  return db.get("meta", key);
+}
+
+export async function setMeta(key, value) {
+  const db = await getDB();
+  return db.put("meta", value, key);
 }

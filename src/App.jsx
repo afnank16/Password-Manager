@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { getMeta } from "./db/db";
+import { getAllVaults } from "./db/db";
 import MasterPasswordSetup from "./components/MasterPasswordSetup";
 import LockScreen from "./components/LockScreen";
 import VaultList from "./components/VaultList";
@@ -7,31 +7,36 @@ import VaultList from "./components/VaultList";
 function App() {
   const [appState, setAppState] = useState(null);
   const [vaultKey, setVaultKey] = useState(null);
+  const [vaultId, setVaultId] = useState(null);
+  const [vaults, setVaults] = useState([]);
   const [entries, setEntries] = useState([]);
 
   useEffect(() => {
     async function checkSetup() {
-      const salt = await getMeta("salt");
-      setAppState(salt ? "locked" : "fresh");
+      const allVaults = await getAllVaults();
+      setVaults(allVaults);
+      setAppState(allVaults.length > 0 ? "locked" : "fresh");
     }
     checkSetup();
   }, []);
 
-  function handleSetup(key) {
+  function handleSetup(key, vaultId) {
     setVaultKey(key);
+    setVaultId(vaultId);
     setAppState("unlocked");
   }
 
-  function handleUnlock(key, loadedEntries) {
+  function handleUnlock(key, vaultId, loadedEntries) {
     setVaultKey(key);
+    setVaultId(vaultId);
     setEntries(loadedEntries);
     setAppState("unlocked");
   }
 
   if (appState === null) return <div className="text-white">Loading...</div>;
   if (appState === "fresh") return <MasterPasswordSetup onSetup={handleSetup} />;
-  if (appState === "locked") return <LockScreen onUnlock={handleUnlock} />;
-  if (appState === "unlocked") return <VaultList vaultKey={vaultKey} entries={entries} setEntries={setEntries} />;
+  if (appState === "locked") return <LockScreen vaults={vaults} onUnlock={handleUnlock} />;
+  if (appState === "unlocked") return <VaultList vaultKey={vaultKey} vaultId={vaultId} entries={entries} setEntries={setEntries} />;
 }
 
 export default App;

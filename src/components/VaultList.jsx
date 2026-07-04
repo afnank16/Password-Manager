@@ -3,7 +3,7 @@ import { addPasswordEntry, removeEntry, loadAllEntries, editPasswordEntry } from
 import { saveEntry, getAllEntries, deleteEntry, getMeta, setMeta, updateEntry } from "../db/db";
 
 
-function VaultList({ vaultKey, entries, setEntries }) {
+function VaultList({ vaultKey, entries, setEntries, vaultId  }) {
   const [editingId, setEditingId] = useState(null);
   const [editFields, setEditFields] = useState({ site: "", username: "", password: "" });
   const [site, setSite] = useState("");
@@ -11,29 +11,36 @@ function VaultList({ vaultKey, entries, setEntries }) {
   const [password, setPassword] = useState("");
   const [visibleIds, setVisibleIds] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [showForm, setShowForm] = useState(false);
   const [search, setSearch] = useState("");
   const [copied, setCopied] = useState(null);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showEditPassword, setShowEditPassword] = useState(false);
   const filtered = entries.filter(e => e.site.toLowerCase().includes(search.toLowerCase()));
 
-  async function handleAdd() {
-    if (!site || !username || !password) return;
-    setLoading(true);
-    await addPasswordEntry({ site, username, password }, vaultKey);
-    const updated = await loadAllEntries(vaultKey);
-    setEntries(updated);
-    setSite("");
-    setUsername("");
-    setPassword("");
-    setLoading(false);
-  }
+async function handleAdd() {
+  if (!site || !username || !password) return;
+  setLoading(true);
+  await addPasswordEntry(vaultId, { site, username, password }, vaultKey);
+  const updated = await loadAllEntries(vaultId, vaultKey);
+  console.log("updated entries:", updated);
+  setEntries(updated);
+  setSite(""); setUsername(""); setPassword("");
+  setLoading(false); setShowForm(false);
+}
 
-  async function handleDelete(id) {
-    await removeEntry(id);
-    const updated = await loadAllEntries(vaultKey);
-    setEntries(updated);
-  }
+async function handleDelete(id) {
+  await removeEntry(id);
+  const updated = await loadAllEntries(vaultId, vaultKey);
+  setEntries(updated);
+}
+
+async function handleEdit() {
+  await editPasswordEntry(editingId, vaultId, editFields, vaultKey);
+  const updated = await loadAllEntries(vaultId, vaultKey);
+  setEntries(updated);
+  setEditingId(null);
+}
   function copyPassword(id, pwd) {
     navigator.clipboard.writeText(pwd);
     setCopied(id);
@@ -51,12 +58,7 @@ function VaultList({ vaultKey, entries, setEntries }) {
     setEditFields({ site: entry.site, username: entry.username, password: entry.password });
   }
 
-  async function handleEdit() {
-    await editPasswordEntry(editingId, editFields, vaultKey);
-    const updated = await loadAllEntries(vaultKey);
-    setEntries(updated);
-    setEditingId(null);
-  }
+
 
 
   return (

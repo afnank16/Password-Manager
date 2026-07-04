@@ -1,64 +1,60 @@
 import { encryptData, decryptData } from "../crypto/crypto";
-import { saveEntry, getAllEntries, deleteEntry, getMeta, setMeta } from "./db";
 import { deriveKeyFromPassword, generateSalt } from "../crypto/crypto";
+import { saveEntry, getAllEntries, deleteEntry, updateEntry, getMeta, setMeta } from "./db";
 
-export async function getOrCreateSalt() {
-  let salt = await getMeta("salt");
+function saltKey(vaultId) { return `vault:${vaultId}:salt`; }
+function verifyKey(vaultId) { return `vault:${vaultId}:verify`; }
+
+export async function getOrCreateSalt(vaultId) {
+  let salt = await getMeta(saltKey(vaultId));
   if (!salt) {
     salt = generateSalt();
-    await setMeta("salt", salt);
+    await setMeta(saltKey(vaultId), salt);
   }
   return salt;
 }
 
-export async function deriveKey(password) {
-  const salt = await getOrCreateSalt();
+export async function deriveKey(vaultId, password) {
+  const salt = await getOrCreateSalt(vaultId);
   return deriveKeyFromPassword(password, salt);
 }
 
-export async function addPasswordEntry(plainEntry, key) {
-  const { ciphertext, iv } = await encryptData(plainEntry, key);
-  const id = await saveEntry({ ciphertext, iv });
-  return id;
+export async function saveVerifyToken(vaultId, key) {
+  const { ciphertext, iv } = await encryptData("vault-ok", key);
+  await setMeta(verifyKey(vaultId), { ciphertext, iv });
 }
 
-export async function loadAllEntries(key) {
-  const entries = await getAllEntries();
-
-  const decrypted = await Promise.all(
-    entries.map(async (entry) => {
-      const data = await decryptData(entry.ciphertext, entry.iv, key);
-      return { id: entry.id, ...data };
-    })
-  );
-
-  return decrypted;
-}
-
-export async function removeEntry(id) {
-  return deleteEntry(id);
-}
-
-const VERIFY_KEY = "verify";
-const VERIFY_PLAINTEXT = "vault-ok";
-
-export async function saveVerifyToken(key) {
-  const { ciphertext, iv } = await encryptData(VERIFY_PLAINTEXT, key);
-  await setMeta(VERIFY_KEY, { ciphertext, iv });
-}
-
-export async function verifyKey(key) {
-  const token = await getMeta(VERIFY_KEY);
-  if (!token) return true; // no token yet, first setup
+export async function verifyPassword(vaultId, key) {
+  const token = await getMeta(verifyKey(vaultId));
+  if (!token) return true;
   try {
     const result = await decryptData(token.ciphertext, token.iv, key);
-    return result === VERIFY_PLAINTEXT;
+    return result === "vault-ok";
   } catch {
     return false;
   }
 }
 
-export async function editPasswordEntry(id, plainEntry, key) {
+export async function addPasswordEntry(vaultId, plainEntry, key) {
   const { ciphertext, iv } = await encryptData(plainEntry, key);
-  await updateEntry(id, { ciphertext, iv });
+  return saveEntry(vaultId, { ciphertext, iv });
+}
+
+export async function loadAllEntries(vaultId, key) {
+  const entries = await getAllEntries(vaultId);
+  return Promise.all(
+    entries.map(async (entry) => {
+      const data = await decryptData(entry.ciphertext, entry.iv, key);
+      return { id: entry.id, ...data };
+    })
+  );
+}
+
+export async function editPasswordEntry(id, vaultId, plainEntry, key) {
+  const { ciphertext, iv } = await encryptData(plainEntry, key);
+  await updateEntry(id, vaultId, { ciphertext, iv });
+}
+
+export async function removeEntry(id) {
+  return deleteEntry(id);
 }
