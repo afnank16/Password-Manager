@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { deriveKey, verifyPassword, loadAllEntries } from "../db/vault";
 
-function LockScreen({ vaults, onUnlock }) {
+function LockScreen({ vaults, onUnlock, onCreateNew }) {
   const [selectedVaultId, setSelectedVaultId] = useState(vaults[0]?.id || null);
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -45,8 +45,7 @@ function LockScreen({ vaults, onUnlock }) {
             className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-semibold py-3 rounded-xl transition shadow-sm shadow-blue-100">
             {loading ? "Unlocking..." : "Unlock"}
           </button>
-
-          <p className="text-center text-sm text-gray-400">Don't have a vault? <span onClick={() => window.location.reload()} className="text-blue-500 cursor-pointer hover:underline">Create one</span></p>
+<p className="text-center text-sm text-gray-400">Don't have a vault? <span onClick={onCreateNew} className="text-blue-500 cursor-pointer hover:underline">Create one</span></p>
         </div>
       </div>
     </div>

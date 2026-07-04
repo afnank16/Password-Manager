@@ -35,8 +35,8 @@ function App() {
 
   if (appState === null) return <div className="text-white">Loading...</div>;
   if (appState === "fresh") return <MasterPasswordSetup onSetup={handleSetup} />;
-  if (appState === "locked") return <LockScreen vaults={vaults} onUnlock={handleUnlock} />;
-  if (appState === "unlocked") return <VaultList vaultKey={vaultKey} vaultId={vaultId} entries={entries} setEntries={setEntries} />;
+if (appState === "locked") return <LockScreen vaults={vaults} onUnlock={handleUnlock} onCreateNew={() => setAppState("fresh")} />;  
+if (appState === "unlocked") return <VaultList vaultKey={vaultKey} vaultId={vaultId} entries={entries} setEntries={setEntries} />;
 }
 
 export default App;
