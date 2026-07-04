@@ -22,7 +22,7 @@ function LockScreen({ onUnlock }) {
   <div className="bg-white p-8 rounded-2xl w-full max-w-md flex flex-col gap-5 shadow-sm border border-gray-200/60 backdrop-blur-sm">
     
     <div>
-      <h1 className="text-gray-900 text-2xl font-bold tracking-tight">Unlock Vault</h1>
+      <h1 className="text-gray-900 text-2xl font-bold tracking-tight">Welcome back!</h1>
       <p className="text-gray-500 text-sm mt-1 leading-relaxed">
         Enter your master password to access your vault.
       </p>

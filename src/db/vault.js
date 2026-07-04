@@ -57,3 +57,8 @@ export async function verifyKey(key) {
     return false;
   }
 }
+
+export async function editPasswordEntry(id, plainEntry, key) {
+  const { ciphertext, iv } = await encryptData(plainEntry, key);
+  await updateEntry(id, { ciphertext, iv });
+}

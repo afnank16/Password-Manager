@@ -42,3 +42,8 @@ export async function deleteEntry(id) {
   const db = await getDB();
   return db.delete(STORE_NAME, id);
 }
+
+export async function updateEntry(id, data) {
+  const db = await getDB();
+  return db.put(STORE_NAME, { ...data, id });
+}
