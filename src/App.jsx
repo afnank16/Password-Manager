@@ -11,7 +11,7 @@ function App() {
   const [vaults, setVaults] = useState([]);
   const [entries, setEntries] = useState([]);
 
-  useEffect(() => {
+  useEffect(() => {// Check if vaults exist in the database
     async function checkSetup() {
       const allVaults = await getAllVaults();
       setVaults(allVaults);
