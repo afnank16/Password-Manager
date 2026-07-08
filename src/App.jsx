@@ -6,6 +6,7 @@ import VaultList from "./components/VaultList";
 
 function App() {
   const [appState, setAppState] = useState(null);
+  const [selectedVaultName, setSelectedVaultName] = useState("");
   const [vaultKey, setVaultKey] = useState(null);
   const [vaultId, setVaultId] = useState(null);
   const [vaults, setVaults] = useState([]);
@@ -20,23 +21,24 @@ function App() {
     checkSetup();
   }, []);
 
-  function handleSetup(key, vaultId) {
+  function handleSetup(key, vaultId) {// Set the vault key and vault ID when setting up a new vault
     setVaultKey(key);
     setVaultId(vaultId);
     setAppState("unlocked");
   }
 
-  function handleUnlock(key, vaultId, loadedEntries) {
+  function handleUnlock(key, vaultId, loadedEntries, selectedVaultName) {// Set the vault key, vault ID, entries, and vault name when unlocking
     setVaultKey(key);
     setVaultId(vaultId);
     setEntries(loadedEntries);
+    setSelectedVaultName(selectedVaultName);
     setAppState("unlocked");
   }
 
   if (appState === null) return <div className="text-white">Loading...</div>;
   if (appState === "fresh") return <MasterPasswordSetup onSetup={handleSetup} />;
   if (appState === "locked") return <LockScreen vaults={vaults} onUnlock={handleUnlock} onCreateNew={() => setAppState("fresh")} />;
-  if (appState === "unlocked") return <VaultList vaultKey={vaultKey} vaultId={vaultId} entries={entries} setEntries={setEntries} />;
+  if (appState === "unlocked") return <VaultList vaultKey={vaultKey} vaultId={vaultId} entries={entries} setEntries={setEntries} vaultName={selectedVaultName} />;
 }
 
 export default App;

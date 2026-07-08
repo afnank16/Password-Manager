@@ -3,6 +3,7 @@ import { deriveKey, verifyPassword, loadAllEntries } from "../db/vault";
 
 function LockScreen({ vaults, onUnlock, onCreateNew }) {
   const [selectedVaultId, setSelectedVaultId] = useState(vaults[0]?.id || null);
+  const [selectedVaultName, setSelectedVaultName] = useState(vaults[0]?.name || "");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -14,7 +15,7 @@ function LockScreen({ vaults, onUnlock, onCreateNew }) {
       const valid = await verifyPassword(selectedVaultId, key);
       if (!valid) { setError("Wrong password"); setLoading(false); return; }
       const entries = await loadAllEntries(selectedVaultId, key);
-      onUnlock(key, selectedVaultId, entries);
+      onUnlock(key, selectedVaultId, entries, selectedVaultName);
     } catch { setError("Wrong password"); setLoading(false); }
   }
 
@@ -27,10 +28,15 @@ function LockScreen({ vaults, onUnlock, onCreateNew }) {
         </div>
 
         <div className="flex flex-col gap-3">
-          <select value={selectedVaultId} onChange={e => setSelectedVaultId(Number(e.target.value))}
+          <select value={selectedVaultId} name={selectedVaultName} onChange={e => {
+            setSelectedVaultId(Number(e.target.value)); const vault = vaults.find(v => v.id === Number(e.target.value));
+            setSelectedVaultName(vault?.name || "");
+          }}
             className="w-full bg-gray-50 text-gray-900 border border-gray-200 rounded-xl px-4 py-3 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100">
             {vaults.map(v => (
-              <option key={v.id} value={v.id}>{v.name}</option>
+              <option key={v.id} value={v.id}>
+                {v.name}
+              </option>
             ))}
           </select>
 
@@ -45,7 +51,7 @@ function LockScreen({ vaults, onUnlock, onCreateNew }) {
             className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-semibold py-3 rounded-xl transition shadow-sm shadow-blue-100">
             {loading ? "Unlocking..." : "Unlock"}
           </button>
-<p className="text-center text-sm text-gray-400">Don't have a vault? <span onClick={onCreateNew} className="text-blue-500 cursor-pointer hover:underline">Create one</span></p>
+          <p className="text-center text-sm text-gray-400">Don't have a vault? <span onClick={onCreateNew} className="text-blue-500 cursor-pointer hover:underline">Create one</span></p>
         </div>
       </div>
     </div>

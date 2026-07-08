@@ -3,7 +3,7 @@ import { addPasswordEntry, removeEntry, loadAllEntries, editPasswordEntry } from
 import { saveEntry, getAllEntries, deleteEntry, getMeta, setMeta, updateEntry } from "../db/db";
 
 
-function VaultList({ vaultKey, entries, setEntries, vaultId  }) {
+function VaultList({ vaultKey, entries, setEntries, vaultId, vaultName }) {
   const [editingId, setEditingId] = useState(null);
   const [editFields, setEditFields] = useState({ site: "", username: "", password: "" });
   const [site, setSite] = useState("");
@@ -58,14 +58,11 @@ async function handleEdit() {
     setEditFields({ site: entry.site, username: entry.username, password: entry.password });
   }
 
-
-
-
   return (
     <div className="min-h-screen bg-gray-50 text-white p-6">
       <div className="max-w-2xl mx-auto flex flex-col gap-6">
         <header className=" rounded-xl w-full bg-white p-4 shadow-sm flex items-center justify-center">
-          <h1 className="text-3xl font-bold my-2 text-slate-900 text-center">My Vault</h1>
+          <h1 className="text-3xl font-bold my-2 text-slate-900 text-center">{vaultName}</h1>
         </header>
 
 
