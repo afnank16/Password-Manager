@@ -65,3 +65,9 @@ export async function setMeta(key, value) {
   const db = await getDB();
   return db.put("meta", value, key);
 }
+
+export async function getVaultByName(name) {
+  const db = await getDB();
+  const all = await db.getAll("vaults");
+  return all.find(v => v.name.toLowerCase() === name.toLowerCase());
+}
