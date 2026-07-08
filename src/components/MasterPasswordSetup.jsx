@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
 import { deriveKey, saveVerifyToken } from "../db/vault";
-import { createVault } from "../db/db";
+import { createVault, getVaultByName } from "../db/db";
 
 
 function MasterPasswordSetup({ onSetup }) {
@@ -13,15 +13,19 @@ function MasterPasswordSetup({ onSetup }) {
   const confirmPasswordRef = useRef(null);
 
   async function handleSetup() {
-    if (!name) { setError("Please enter a vault name"); return; }
-    if (password.length < 8) { setError("Password must be at least 8 characters"); return; }
-    if (password !== confirm) { setError("Passwords do not match"); return; }
-    setLoading(true);
-    const vaultId = await createVault(name);
-    const key = await deriveKey(vaultId, password);
-    await saveVerifyToken(vaultId, key);
-    onSetup(key, vaultId);
-  }
+  if (!name) { setError("Please enter a vault name"); return; }
+  if (password.length < 8) { setError("Password must be at least 8 characters"); return; }
+  if (password !== confirm) { setError("Passwords do not match"); return; }
+  
+  const existing = await getVaultByName(name);
+  if (existing) { setError("A vault with this name already exists"); return; }
+
+  setLoading(true);
+  const vaultId = await createVault(name);
+  const key = await deriveKey(vaultId, password);
+  await saveVerifyToken(vaultId, key);
+  onSetup(key, vaultId);
+}
 
   const handleKeyDown = (e, nextRef) => { // Handle Enter key to move focus to the next input
     if (e.key === "Enter") {
