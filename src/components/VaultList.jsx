@@ -19,31 +19,35 @@ function VaultList({ vaultKey, entries, setEntries, vaultId, vaultName }) {
   const [copied, setCopied] = useState(null);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showEditPassword, setShowEditPassword] = useState(false);
-  const filtered = entries.filter(e => e.site.toLowerCase().includes(search.toLowerCase()));
+  const [searchQuery, setSearchQuery] = useState("");
+  const filtered = entries.filter(entry =>
+    entry.site?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    entry.username?.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
-async function handleAdd() {
-  if (!site || !username || !password) return;
-  setLoading(true);
-  await addPasswordEntry(vaultId, { site, username, password }, vaultKey);
-  const updated = await loadAllEntries(vaultId, vaultKey);
-  console.log("updated entries:", updated);
-  setEntries(updated);
-  setSite(""); setUsername(""); setPassword("");
-  setLoading(false); setShowForm(false);
-}
+  async function handleAdd() {
+    if (!site || !username || !password) return;
+    setLoading(true);
+    await addPasswordEntry(vaultId, { site, username, password }, vaultKey);
+    const updated = await loadAllEntries(vaultId, vaultKey);
+    console.log("updated entries:", updated);
+    setEntries(updated);
+    setSite(""); setUsername(""); setPassword("");
+    setLoading(false); setShowForm(false);
+  }
 
-async function handleDelete(id) {
-  await removeEntry(id);
-  const updated = await loadAllEntries(vaultId, vaultKey);
-  setEntries(updated);
-}
+  async function handleDelete(id) {
+    await removeEntry(id);
+    const updated = await loadAllEntries(vaultId, vaultKey);
+    setEntries(updated);
+  }
 
-async function handleEdit() {
-  await editPasswordEntry(editingId, vaultId, editFields, vaultKey);
-  const updated = await loadAllEntries(vaultId, vaultKey);
-  setEntries(updated);
-  setEditingId(null);
-}
+  async function handleEdit() {
+    await editPasswordEntry(editingId, vaultId, editFields, vaultKey);
+    const updated = await loadAllEntries(vaultId, vaultKey);
+    setEntries(updated);
+    setEditingId(null);
+  }
   function copyPassword(id, pwd) {
     navigator.clipboard.writeText(pwd);
     setCopied(id);
@@ -63,12 +67,12 @@ async function handleEdit() {
 
 
   return (
-   <div className="min-h-screen bg-[#d2d8eb] bg-gray-100 text-slate-800 antialiased selection:bg-blue-100 overflow-x-hidden">
+    <div className="min-h-screen bg-[#d2d8eb] bg-gray-100 text-slate-800 antialiased selection:bg-blue-100 overflow-x-hidden">
       {/* Subtle Engineering Grid Overlay */}
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#e2e8f080_1px,transparent_1px),linear-gradient(to_bottom,#e2e8f080_1px,transparent_1px)] bg-[size:4rem_4rem] pointer-events-none" />
-      
+
       <div className="max-w-6xl mx-auto p-4 md:p-8 relative z-10">
-        
+
         {/* --- DESKTOP APPLICATION CONTROLS BAR --- */}
         <header className="mb-6 bg-white border border-slate-200 shadow-sm rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3">
@@ -80,7 +84,7 @@ async function handleEdit() {
               <h1 className="text-xl font-black tracking-tight text-slate-900">{vaultName || "Personal Vault"}</h1>
             </div>
           </div>
-          
+
           {/* Action Header Stats */}
           <div className="flex items-center gap-2 bg-slate-100 border border-slate-200 rounded-xl p-1.5 text-xs">
             <span className="px-2 py-1 bg-white rounded-lg text-slate-500 shadow-sm">SYSTEM: ONLINE</span>
@@ -90,12 +94,12 @@ async function handleEdit() {
 
         {/* --- MAIN DESKTOP GRID --- */}
         <div className="grid lg:grid-cols-12 gap-6 items-start">
-          
+
           {/* LEFT COLUMN: CONTROL PANEL & FORM (4 Cols) */}
           <div className="lg:col-span-4 space-y-6">
             <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm relative overflow-hidden">
               <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-blue-500 to-transparent opacity-60" />
-              
+
               <div className="flex items-center gap-2 mb-6">
                 <Plus className="w-4 h-4 text-blue-600" />
                 <h2 className="text-xs font-black  tracking-widest text-slate-400">Add New Credentials</h2>
@@ -141,7 +145,7 @@ async function handleEdit() {
                       onChange={(e) => setPassword(e.target.value)}
                       className="w-full bg-slate-50 text-slate-900 placeholder:text-slate-300 border border-slate-200 rounded-xl pl-10 pr-12 py-3 text-sm focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/5 outline-none transition-all tracking-wide"
                     />
-                    <button 
+                    <button
                       onClick={() => setShowNewPassword(p => !p)}
                       type="button"
                       className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-600 transition rounded-md"
@@ -164,26 +168,35 @@ async function handleEdit() {
 
           {/* RIGHT COLUMN: INTERACTIVE DATA MATRIX (8 Cols) */}
           <div className="lg:col-span-8 space-y-4">
-            
+
             {/* Embedded Sub-Navbar search utility */}
             <div className="bg-white border border-slate-200 rounded-xl px-4 py-3 flex items-center gap-3 shadow-sm">
               <div className="pl-3 text-slate-400"><Search className="w-4 h-4" /></div>
-              <input 
-                type="text" 
-                placeholder="Filter entries by host or identifier..." 
+              <input
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                type="text"
+                placeholder="Filter entries by host or identifier..."
                 className="w-full bg-transparent border-none outline-none text-xs text-slate-700 font-medium placeholder:text-slate-400 focus:ring-0"
               />
+              {searchQuery && (
+    <button 
+      onClick={() => setSearchQuery("")}
+      className="text-[10px] bg-slate-100 hover:bg-slate-200 text-slate-500 px-2 py-1 rounded-md font-bold transition mr-1"
+    >
+      Clear
+    </button>
+  )}
             </div>
 
             <div className="space-y-3 max-h-[calc(100vh-240px)] overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-slate-200">
               {filtered && filtered.map(entry => (
                 <div
                   key={entry.id}
-                  className={`border transition-all duration-200 rounded-2xl p-4 ${
-                    editingId === entry.id 
-                      ? "bg-white border-blue-500 shadow-md ring-4 ring-blue-500/5" 
+                  className={`border transition-all duration-200 rounded-2xl p-4 ${editingId === entry.id
+                      ? "bg-white border-blue-500 shadow-md ring-4 ring-blue-500/5"
                       : "bg-white border-slate-200 shadow-sm hover:border-slate-300 hover:bg-slate-50/50"
-                  }`}
+                    }`}
                 >
                   {editingId === entry.id ? (
                     /* --- APPLICATION DESKTOP INLINE EDIT MODE --- */
@@ -218,7 +231,7 @@ async function handleEdit() {
                               placeholder="Secret Cipher"
                             />
                           </div>
-                          <button 
+                          <button
                             onClick={() => setShowEditPassword(p => !p)}
                             type="button"
                             className="text-slate-400 hover:text-slate-600 transition"
@@ -246,14 +259,14 @@ async function handleEdit() {
                   ) : (
                     /* --- PREMIUM DESKTOP APPARATUS VIEW MODE --- */
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                      
+
                       {/* Grid Item Details */}
                       <div className="flex items-center gap-4 flex-1 min-w-0">
                         {/* Domain App Visual Node */}
                         <div className="w-10 h-10 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-center shrink-0 text-slate-500 font-black text-sm ">
                           {entry.site ? entry.site.substring(0, 2) : "••"}
                         </div>
-                        
+
                         <div className="space-y-0.5 min-w-0 flex-1">
                           <h4 className="font-bold text-slate-900 text-sm truncate tracking-tight">{entry.site}</h4>
                           <div className="flex flex-wrap items-center gap-x-3 text-xs text-slate-500 font-medium">
@@ -282,9 +295,9 @@ async function handleEdit() {
                           >
                             {visibleIds.includes(entry.id) ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
                           </button>
-                          
+
                           <div className="w-[1px] h-4 bg-slate-200 my-auto" />
-                          
+
                           <button
                             onClick={() => copyPassword(entry.id, entry.password)}
                             className={`p-2 transition rounded-lg ${copied === entry.id ? "text-emerald-600 bg-emerald-50" : "text-slate-400 hover:text-slate-700 hover:bg-white"}`}
@@ -315,7 +328,7 @@ async function handleEdit() {
                   )}
                 </div>
               ))}
-              
+
               {(!filtered || filtered.length === 0) && (
                 <div className="text-center py-12 bg-white border border-dashed border-slate-200 rounded-2xl">
                   <Terminal className="w-8 h-8 text-slate-300 mx-auto mb-3" />
