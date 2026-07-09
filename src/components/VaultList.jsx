@@ -72,7 +72,7 @@ async function handleEdit() {
         {/* --- DESKTOP APPLICATION CONTROLS BAR --- */}
         <header className="mb-6 bg-white border border-slate-200 shadow-sm rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-violet-600 flex items-center justify-center shadow-md shadow-blue-200">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-blue-600 flex items-center justify-center shadow-md shadow-blue-200">
               <Shield className="w-5 h-5 text-white" strokeWidth={2.5} />
             </div>
             <div>
@@ -98,12 +98,12 @@ async function handleEdit() {
               
               <div className="flex items-center gap-2 mb-6">
                 <Plus className="w-4 h-4 text-blue-600" />
-                <h2 className="text-xs font-black uppercase tracking-widest text-slate-400">Add New Credentials</h2>
+                <h2 className="text-xs font-black  tracking-widest text-slate-400">Add New Credentials</h2>
               </div>
 
               <div className="space-y-4">
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400 block ml-1">Target Host</label>
+                  <label className="text-[12px] font-bold  tracking-widest text-slate-400 block ml-1">Website</label>
                   <div className="relative">
                     <Globe className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                     <input
@@ -117,7 +117,7 @@ async function handleEdit() {
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400 block ml-1">Identity User</label>
+                  <label className="text-[12px] font-bold  tracking-widest text-slate-400 block ml-1">Username</label>
                   <div className="relative">
                     <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                     <input
@@ -131,7 +131,7 @@ async function handleEdit() {
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400 block ml-1">Cipher Key</label>
+                  <label className="text-[12px] font-bold  tracking-widest text-slate-400 block ml-1">Password</label>
                   <div className="relative">
                     <Key className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                     <input
@@ -154,7 +154,7 @@ async function handleEdit() {
                 <button
                   onClick={handleAdd}
                   disabled={loading}
-                  className="w-full mt-2 bg-gradient-to-r from-blue-600 to-violet-600 hover:from-blue-500 hover:to-violet-500 text-white font-bold text-sm py-3.5 rounded-xl transition-all active:scale-[0.99] shadow-md shadow-blue-200 disabled:opacity-50"
+                  className="w-full mt-2 bg-gradient-to-r from-blue-600 to-blue-600 hover:from-blue-500 hover:to-blue-500 text-white font-bold text-sm py-3.5 rounded-xl transition-all active:scale-[0.99] shadow-md shadow-blue-200 disabled:opacity-50"
                 >
                   {loading ? "Encrypting Asset..." : "Add Credential"}
                 </button>
@@ -166,7 +166,7 @@ async function handleEdit() {
           <div className="lg:col-span-8 space-y-4">
             
             {/* Embedded Sub-Navbar search utility */}
-            <div className="bg-white border border-slate-200 rounded-xl p-2 flex items-center gap-3 shadow-sm">
+            <div className="bg-white border border-slate-200 rounded-xl px-4 py-3 flex items-center gap-3 shadow-sm">
               <div className="pl-3 text-slate-400"><Search className="w-4 h-4" /></div>
               <input 
                 type="text" 
@@ -250,7 +250,7 @@ async function handleEdit() {
                       {/* Grid Item Details */}
                       <div className="flex items-center gap-4 flex-1 min-w-0">
                         {/* Domain App Visual Node */}
-                        <div className="w-10 h-10 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-center shrink-0 text-slate-500 font-black text-sm uppercase">
+                        <div className="w-10 h-10 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-center shrink-0 text-slate-500 font-black text-sm ">
                           {entry.site ? entry.site.substring(0, 2) : "••"}
                         </div>
                         
