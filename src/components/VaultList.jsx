@@ -234,7 +234,7 @@ function VaultList({ vaultKey, entries, setEntries, vaultId, vaultName }) {
                           <button
                             onClick={() => setShowEditPassword(p => !p)}
                             type="button"
-                            className="text-blue-300 hover:text-blue-600 transition"
+                            className="text-blue-300 hover:text-blue-600 transition "
                           >
                             {showEditPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
                           </button>
@@ -289,7 +289,7 @@ function VaultList({ vaultKey, entries, setEntries, vaultId, vaultName }) {
                             className="p-2 text-slate-400 hover:text-teal-600 hover:bg-white rounded-lg transition shadow-none hover:shadow-sm"
                             title={visibleIds.includes(entry.id) ? "Hide Password" : "Reveal Password"}
                           >
-                            {visibleIds.includes(entry.id) ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                            {visibleIds.includes(entry.id) ? <EyeOff className="w-3.5 h-3.5 cursor-pointer" /> : <Eye className="w-3.5 h-3.5 cursor-pointer" />}
                           </button>
 
                           <div className="w-[1px] h-4 bg-slate-200 my-auto" />
@@ -299,7 +299,7 @@ function VaultList({ vaultKey, entries, setEntries, vaultId, vaultName }) {
                             className={`p-2 transition rounded-lg ${copied === entry.id ? "text-emerald-600 bg-emerald-50" : "text-slate-400 hover:text-blue-600 hover:bg-white"}`}
                             title="Copy Password"
                           >
-                            {copied === entry.id ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+                            {copied === entry.id ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5 cursor-pointer" />}
                           </button>
                         </div>
 
