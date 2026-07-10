@@ -67,7 +67,7 @@ function VaultList({ vaultKey, entries, setEntries, vaultId, vaultName }) {
 
 
   return (
-    <div className="min-h-screen bg-[#d2d8eb] bg-gray-100 text-slate-800 antialiased selection:bg-blue-100 overflow-x-hidden">
+    <div className="min-h-screen bg-gray-100 text-slate-800 antialiased selection:bg-blue-100 overflow-x-hidden">
       {/* Subtle Engineering Grid Overlay */}
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#e2e8f080_1px,transparent_1px),linear-gradient(to_bottom,#e2e8f080_1px,transparent_1px)] bg-[size:4rem_4rem] pointer-events-none" />
 
@@ -195,7 +195,7 @@ function VaultList({ vaultKey, entries, setEntries, vaultId, vaultName }) {
                   key={entry.id}
                   className={`border transition-all duration-200 rounded-2xl p-4 ${editingId === entry.id
                     ? "bg-white border-blue-400 shadow-md ring-4 ring-blue-500/10"
-                    : "bg-white border-slate-200 shadow-sm hover:border-blue-200 hover:bg-blue-50/20"
+                    : "bg-white border-2 border-slate-200 shadow-sm hover:border-blue-200 hover:shadow-md hover:bg-blue-300/5"
                     }`}
                 >
                   {editingId === entry.id ? (
